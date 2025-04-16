@@ -21,6 +21,9 @@ function App() {
   const [selectedCols, setSelectedCols] = useState([]);
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
+  const [isNewTable, setIsNewTable] = useState(false);
+  const [newTableName, setNewTableName] = useState('');
+
 
   const handleChange = (e) => {
     setProps({ ...props, [e.target.name]: e.target.value });
@@ -67,9 +70,16 @@ function App() {
   };  
   
   const ingestFromFile = async () => {
+    const tableName = isNewTable ? newTableName : selectedTable;
+  
+    if (!tableName || !file) {
+      setMessage("Please provide a table name and select a file.");
+      return;
+    }
+  
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('tableName', selectedTable);
+    formData.append('tableName', tableName);
     formData.append('config', new Blob([JSON.stringify(props)], { type: 'application/json' }));
   
     try {
@@ -82,7 +92,8 @@ function App() {
     } catch (err) {
       setMessage("Upload failed: " + err.message);
     }
-  };  
+  };
+   
 
   return (
     <div className="container">
@@ -131,9 +142,40 @@ function App() {
       <button onClick={ingestToFile}>Ingest ClickHouse → File</button>
 
       <div>
-        <h4>Upload File for Ingesting to ClickHouse</h4>
-        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-        <button onClick={ingestFromFile}>Upload</button>
+      <h4>Upload File for Ingesting to ClickHouse</h4>
+
+<label>
+  <input
+    type="checkbox"
+    checked={isNewTable}
+    onChange={() => setIsNewTable(!isNewTable)}
+  />{' '}
+  Create new table
+</label>
+
+{isNewTable ? (
+  <>
+    <label>New Table Name</label>
+    <input
+      type="text"
+      value={newTableName}
+      onChange={(e) => setNewTableName(e.target.value)}
+      placeholder="Enter new table name"
+    />
+  </>
+) : (
+  <>
+    <label>Select Existing Table</label>
+    <select onChange={(e) => setSelectedTable(e.target.value)}>
+      <option>Select table</option>
+      {tables.map((t) => <option key={t}>{t}</option>)}
+    </select>
+  </>
+)}
+
+<input type="file" onChange={(e) => setFile(e.target.files[0])} />
+<button onClick={ingestFromFile}>Upload</button>
+
       </div>
 
       <div>
