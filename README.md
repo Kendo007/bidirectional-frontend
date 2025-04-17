@@ -76,7 +76,6 @@ git checkout master
 ```bash
 git clone --branch postDevelop --single-branch https://github.com/Kendo007/bidirectional.git
 git clone https://github.com/Kendo007/bidirectional-frontend
-cd bidirectional-ingestion-java-react
 ```
 
 ---
@@ -88,6 +87,7 @@ cd bidirectional-ingestion-java-react
 3. **Run the Spring Boot App**:
 
 ```bash
+cd bidirectional
 mvn spring-boot:run
 ```
 
@@ -99,7 +99,7 @@ By default, it runs at: `http://localhost:8080`
 
 1. Navigate to `frontend/` folder:
 ```bash
-cd frontend
+cd cd bidirectional-frontend
 ```
 
 2. Install dependencies:
