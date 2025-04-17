@@ -27,23 +27,45 @@ function App() {
   const [previewRows, setPreviewRows] = useState([]);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
 
-
+  axios.interceptors.response.use(
+    res => res,
+    err => {
+      if (err.response?.status === 401) {
+        alert("Authentication failed. Please check your credentials.");
+      }
+      return Promise.reject(err);
+    }
+  );
 
   const handleChange = (e) => {
     setProps({ ...props, [e.target.name]: e.target.value });
   };
 
   const fetchTables = async () => {
-    const res = await axios.post(`${API_BASE}/tables`, props);
-    setTables(res.data);
-  };
+    try {
+      const res = await axios.post(`${API_BASE}/tables`, props);
+      setTables(res.data);
+      setMessage("✅ Connected Successfully.");
+    } catch (err) {
+      const msg =  "❌ Failed to Connect. Please Check Credentials";
+      setMessage("❌ " + msg);
+    }
+  };  
 
   const fetchColumns = async () => {
-    const res = await axios.post(`${API_BASE}/columns`, props, {
-      params: { tableName: selectedTable }
-    });
-    setColumns(res.data);
+    try {
+      const res = await axios.post(`${API_BASE}/columns`, props, {
+        params: { tableName: selectedTable }
+      });
+      setColumns(res.data);
+      setMessage("✅ Columns loaded.");
+    } catch (err) {
+      const msg = err.response?.data || err.message || "❌ Failed to load columns.";
+      setMessage("❌ " + msg);
+      setColumns([]); 
+    }
   };
+  
 
   const previewData = async () => {
     const payload = {
@@ -61,7 +83,7 @@ function App() {
       setMessage("❌ Preview failed: " + err.message);
     }
   };
-    
+  
   const ingestToFile = async () => {
     const payload = {
       tableName: selectedTable,
@@ -71,16 +93,23 @@ function App() {
   
     try {
       setProgress(0);
-      setMessage("⏳ Download started...");
+      setMessage("⏬ Download started...");
   
       const res = await axios.post(`${API_BASE}/to-file`, payload, {
         responseType: 'blob',
         onDownloadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            setProgress(percentCompleted);
+          const loaded = progressEvent.loaded;
+          const total = progressEvent.total || null;
+  
+          const loadedMB = (loaded / (1024 * 1024)).toFixed(2);
+          const totalMB = total ? (total / (1024 * 1024)).toFixed(2) : null;
+  
+          setMessage(totalMB
+            ? `📥 Downloaded: ${loadedMB} MB / ${totalMB} MB`
+            : `📥 Downloaded: ${loadedMB} MB`);
+  
+          if (total) {
+            setProgress(Math.round((loaded * 100) / total));
           }
         }
       });
@@ -88,7 +117,6 @@ function App() {
       const blob = new Blob([res.data], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-  
       link.href = url;
       link.setAttribute('download', `${selectedTable}_export.csv`);
       document.body.appendChild(link);
@@ -97,12 +125,13 @@ function App() {
   
       setProgress(100);
       setMessage("✅ File downloaded successfully.");
+      setTimeout(() => setProgress(0), 2000);
     } catch (err) {
-      setMessage("❌ Download failed: " + err.message);
       setProgress(0);
+      setMessage("❌ Download failed: " + err.message);
     }
-  };    
-  
+  };  
+    
   const ingestFromFile = async () => {
     const tableName = isNewTable ? newTableName : selectedTable;
   
@@ -117,14 +146,32 @@ function App() {
     formData.append('config', new Blob([JSON.stringify(props)], { type: 'application/json' }));
   
     try {
-      const res = await axios.post(`${API_BASE}/from-file`, formData, {
+      setProgress(0);
+      setMessage("⏫ Upload started...");
+  
+      await axios.post(`${API_BASE}/from-file`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
+        },
+        onUploadProgress: (progressEvent) => {
+          const uploaded = progressEvent.loaded;
+          const total = progressEvent.total || file.size;
+  
+          const uploadedMB = (uploaded / (1024 * 1024)).toFixed(2);
+          const totalMB = (total / (1024 * 1024)).toFixed(2);
+  
+          const percent = Math.round((uploaded * 100) / total);
+          setProgress(percent);
+          setMessage(`📤 Uploaded: ${uploadedMB} MB / ${totalMB} MB`);
         }
       });
-      setMessage(res.data);
+  
+      setProgress(100);
+      setMessage("✅ File uploaded and ingested into ClickHouse.");
+      setTimeout(() => setProgress(0), 2000);
     } catch (err) {
-      setMessage("Upload failed: " + err.message);
+      setProgress(0);
+      setMessage("❌ Upload failed: " + err.message);
     }
   };
    
@@ -136,18 +183,19 @@ function App() {
 
       <h4>ClickHouse Connection</h4>
       {Object.keys(props).map((key) => (
-        <div key={key}>
-          <label>{key}:</label>
-          <input
-            type="text"
-            name={key}
-            value={props[key]}
-            onChange={handleChange}
-          />
-        </div>
+      <div key={key}>
+        <label>{key}:</label>
+        <input
+          type={key.toLowerCase().includes("password") ? "password" : "text"}  // 👈 hides password
+          name={key}
+          value={props[key]}
+          onChange={handleChange}
+        />
+      </div>
       ))}
 
-      <button onClick={fetchTables}>Load Tables</button>
+
+      <button onClick={fetchTables}>Connect</button>
       <select onChange={(e) => setSelectedTable(e.target.value)}>
         <option>Select a table</option>
         {tables.map((t) => <option key={t}>{t}</option>)}
