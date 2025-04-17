@@ -1,70 +1,155 @@
-# Getting Started with Create React App
+# Bidirectional ClickHouse ↔ FlatFile Ingestion Tool
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack ingestion system built with **React** and **Spring Boot (Java)** that enables uploading and downloading CSV data from a **ClickHouse** database. Designed for high-throughput, large-scale data pipelines, the tool offers real-time feedback, progress tracking, streaming support, and dynamic column and table control.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 📌 Note
 
-### `npm start`
+Development work done **before `17th April`** is available on the `master` branch.  
+If you prefer to view only the work completed **up to `16th April`**, please switch to the dedicated branch:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```bash
+git checkout master
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+> This branch preserves the state of the project *before any updates made on or after 17th April. In frontend please checkout to this log `7706f0251893f2b3231dc6c0f017cfb2aedc32b3`*
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🚀 Features
 
-### `npm run build`
+- 🔁 **Bidirectional Ingestion**: Upload files to ClickHouse & export data from ClickHouse to CSV.
+- 📤 **Streamed Uploads**: Real-time multipart CSV ingestion with progress tracking (MB-wise).
+- 📥 **Streamed Downloads**: Data exported directly from ClickHouse using `StreamingResponseBody`.
+- 📊 **Column Selection**: Choose specific columns to upload or export.
+- 🔐 **Secure Auth**: Supports password or JWT-based authentication to ClickHouse.
+- 📄 **Preview Mode**: View first 100 rows before downloading or uploading data.
+- ⚠️ **Error-Handled**: All ClickHouse and network exceptions handled gracefully.
+- ✅ **Progress Bars**: Real-time upload/download progress displayed in MB and %.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## ⚙️ Tech Stack
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **Frontend**: React (with JSX), Axios
+- **Backend**: Java, Spring Boot (REST + Streaming)
+- **Database**: ClickHouse (25.x or later)
+- **Others**: Multipart handling, `InputStream`/`OutputStream`, CSV parser
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 📤 Uploading a CSV to ClickHouse
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. **Go to Upload Section** on the frontend.
+2. Select whether to create a **new table** or use an **existing one**.
+3. Upload a CSV file using file picker.
+4. Provide ClickHouse connection details:
+   - Host, Port, Username, Password or JWT Token
+   - Target database and table name
+5. Click **Upload**:
+   - File is streamed to backend in chunks.
+   - Progress bar shows real-time upload MB.
+   - Backend inserts data into ClickHouse.
+6. On success, the data is immediately available in ClickHouse.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 📥 Downloading from ClickHouse
 
-## Learn More
+1. **Go to Download Section**.
+2. Enter ClickHouse details (host, credentials, etc.).
+3. Click **Load Tables**.
+4. Select a table and fetch columns.
+5. Choose specific columns (or all).
+6. Click **Download**:
+   - File is streamed from ClickHouse to browser.
+   - Progress bar shows MB downloaded.
+   - File is saved as `.csv`.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🖥️ Setup Instructions
 
-### Code Splitting
+### 🔁 Clone the Repository
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+git clone https://github.com/your-repo/bidirectional-ingestion-java-react.git
+cd bidirectional-ingestion-java-react
+```
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 🧱 Backend Setup (Spring Boot + Java)
 
-### Making a Progressive Web App
+1. **Open in IntelliJ or VS Code with Java support**.
+2. **Configure ClickHouse properties** in `application.yml` (optional).
+3. **Run the Spring Boot App**:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+mvn spring-boot:run
+```
 
-### Advanced Configuration
+By default, it runs at: `http://localhost:8080`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
+### 🎨 Frontend Setup (React)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+1. Navigate to `frontend/` folder:
+```bash
+cd frontend
+```
 
-### `npm run build` fails to minify
+2. Install dependencies:
+```bash
+npm install
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+3. Run development server:
+```bash
+npm run start
+```
+
+Access the frontend at: `http://localhost:3000`
+
+---
+
+## 🧠 Advanced Features
+
+- **Custom Delimiters**: Upload and download using user-defined delimiters.
+- **Header Validation**: Ensures column alignment before ClickHouse ingestion.
+- **Authentication Handling**: Invalid credentials show clear UI messages.
+- **Download & Upload Byte Counter**: Real-time MB tracked in frontend.
+- **Global Error Interceptor**: Friendly responses for 401, 500, or malformed input.
+
+---
+
+## 📁 Project Structure
+
+```
+backend/
+├── controller/
+├── service/
+├── model/
+├── exception/
+├── util/
+
+frontend/
+├── components/
+├── services/
+├── App.js
+├── App.css
+```
+
+---
+
+## 📬 Contributions & License
+
+Pull requests and improvements are welcome!  
+MIT License – Free to use and modify.
+
+---
+
+✅ Built for developers and data engineers working with ClickHouse at scale.
+---
