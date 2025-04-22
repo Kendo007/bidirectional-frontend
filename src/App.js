@@ -1,12 +1,14 @@
 // App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 
 const API_BASE = 'http://localhost:8080/api/ingestion';
 
 function App() {
+  const [connected, setConnected] = useState(false);
   const [props, setProps] = useState({
+    protocol: 'http',
     host: '',
     port: '',
     database: '',
@@ -29,6 +31,21 @@ function App() {
   const [showPreviewModalCSV, setShowPreviewModalCSV] = useState(false);
   const [csvCols, setCsvCols] = useState([]);
   const [selectedCsvCols, setSelectedCsvCols] = useState([]);
+
+  // --- Column Types ---
+  const [typeOptions, setTypeOptions] = useState([]);
+  const [selectedTypes, setSelectedTypes] = useState({});
+
+  // --- Fetch type options once upon successful connection ---
+  useEffect(() => {
+    if (!connected) return;
+    axios
+      .post(`${API_BASE}/types`, props)
+      .then(res => setTypeOptions(res.data))
+      .catch(err => console.error('Failed to load type options', err));
+  },
+    // eslint-disable-next-line
+    [connected]);
 
   const loadCsvColumnsAndPreview = async () => {
     if (!file) return setMessage("❌ Please select a file.");
@@ -60,13 +77,13 @@ function App() {
       let offset = 0;
       let textBuffer = '';
       let lines = [];
-  
+
       const processLines = () => {
         const allLines = textBuffer.split(/\r?\n/);
         // Save last partial line back to buffer for next chunk
-        textBuffer = allLines.pop(); 
+        textBuffer = allLines.pop();
         lines.push(...allLines);
-  
+
         if (lines.length >= lineLimit + 1 || offset >= originalFile.size) {
           // Final chunk or limit reached
           const finalLines = lines.slice(0, lineLimit + 1);
@@ -83,23 +100,23 @@ function App() {
           readNextChunk();
         }
       };
-  
+
       const readNextChunk = () => {
         const slice = originalFile.slice(offset, offset + CHUNK_SIZE);
         reader.readAsText(slice);
       };
-  
+
       reader.onload = () => {
         offset += CHUNK_SIZE;
         textBuffer += reader.result;
         processLines();
       };
-  
+
       reader.onerror = () => reject("❌ Error reading file.");
-  
+
       readNextChunk(); // Start reading
     });
-  };  
+  };
 
   axios.interceptors.response.use(
     res => res,
@@ -119,6 +136,7 @@ function App() {
     try {
       const res = await axios.post(`${API_BASE}/tables`, props);
       setTables(res.data);
+      setConnected(true);
       setMessage("✅ Connected Successfully.");
     } catch (err) {
       const msg = "❌ Failed to Connect. Please Check Credentials";
@@ -223,6 +241,9 @@ function App() {
     formData.append('config', new Blob([JSON.stringify(props)], { type: 'application/json' }));
     formData.append('headers', new Blob([JSON.stringify(selectedCsvCols)], { type: 'application/json' }));
 
+    if (isNewTable)
+      formData.append('types', new Blob([JSON.stringify(selectedTypes)], { type: 'application/json' }));
+
     try {
       setProgress(0);
       setMessage("⏫ Upload started...");
@@ -260,11 +281,24 @@ function App() {
         <h2>ClickHouse ↔ File Ingestion Tool</h2>
 
         <h4>ClickHouse Connection</h4>
-        {Object.keys(props).map((key) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <select name="protocol" value={props.protocol} onChange={handleChange} style={{ width: '70px' }}>
+            <option value="http">http</option>
+            <option value="https">https</option>
+          </select>
+          <input
+            type="text"
+            name="host"
+            placeholder="Host"
+            value={props.host}
+            onChange={handleChange}
+          />
+        </div>
+        {['port', 'database', 'username', 'jwtToken', 'password', 'delimiter'].map(key => (
           <div key={key}>
             <label>{key}:</label>
             <input
-              type={key.toLowerCase().includes("password") ? "password" : "text"}  // 👈 hides password
+              type={key.toLowerCase().includes('password') ? 'password' : 'text'}
               name={key}
               value={props[key]}
               onChange={handleChange}
@@ -339,28 +373,27 @@ function App() {
             </>
           )}
 
-          <input type="file" onChange={e => { setFile(e.target.files[0]); setCsvCols([]); setSelectedCsvCols([]); }} />
+          <input type="file" onChange={e => { setFile(e.target.files[0]); setCsvCols([]); setSelectedCsvCols([]); setSelectedTypes([]); }} />
 
           {csvCols.length > 0 && (
             <div>
-              <h4>📝 Select Columns from CSV</h4>
-              {csvCols.map((col) => (
-                <label key={col}>
-                  <input
-                    type="checkbox"
-                    checked={selectedCsvCols.includes(col)}
-                    onChange={() => {
-                      setSelectedCsvCols((prev) =>
-                        prev.includes(col)
-                          ? prev.filter((c) => c !== col)
-                          : [...prev, col]
-                      );
-                    }}
-                  />
-                  {col}
-                </label>
+              <h4>📝 Columns</h4>
+              {csvCols.map(col => (
+                <div key={col} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={selectedCsvCols.includes(col)}
+                      onChange={() => setSelectedCsvCols(prev => prev.includes(col) ? prev.filter(c => c !== col) : [...prev, col])}
+                    /> {col}
+                  </label>
+                  {isNewTable && (
+                    <select value={selectedTypes[col]} onChange={e => setSelectedTypes(prev => ({ ...prev, [col]: e.target.value }))}>
+                      {typeOptions.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  )}
+                </div>
               ))}
-              <br />
             </div>
           )}
 
