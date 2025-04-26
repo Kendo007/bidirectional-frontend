@@ -16,7 +16,6 @@ export async function apiRequest(
 ): Promise<Response> {
   url = SPRING_BOOT_URL + url
   
-  console.log(url)
   const res = await fetch(url, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
