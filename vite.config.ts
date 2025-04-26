@@ -9,7 +9,7 @@ export default defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, process.cwd(), ""); // "" loads all VITE_ variables
   const isReplit = process.env.REPL_ID !== undefined;
 
-  console.log("🌱 ENV FROM .env FILE:", env.VITE_SPRING_BOOT_URL);
+  console.log("Ensure SpringBoot is running on: ", env.VITE_SPRING_BOOT_URL);
 
   return {    
     plugins: [

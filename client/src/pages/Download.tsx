@@ -850,26 +850,19 @@ export default function DownloadPage() {
                 />
               </CardContent>
               <CardFooter className="flex justify-between border-t px-6 py-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handlePreview}
-                  disabled={isLoading || !mainTable || selectedColumns.length === 0}
-                  className="bg-white border border-slate-200 hover:bg-slate-100 text-slate-900"
-                >
-                  {(downloadProgress || isLoading) ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
+                {!isLoading &&
+                  (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handlePreview}
+                      disabled={!mainTable || selectedColumns.length === 0}
+                      className="bg-white border border-slate-200 hover:bg-slate-100 text-slate-900"
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      <span>Preview Results</span>
+                    </Button>
                   )}
-                  <span>
-                    {downloadProgress
-                      ? "Downloading..."
-                      : isLoading
-                        ? "Processing..."
-                        : "Preview Results"}
-                  </span>
-                </Button>
 
                 <div className="w-full space-y-1">
                   <ProgressButton
@@ -877,7 +870,7 @@ export default function DownloadPage() {
                     onClick={handleDownload}
                     isLoading={isLoading}
                     disabled={isLoading || !mainTable || selectedColumns.length === 0}
-                    loadingText="Downloading..."
+                    loadingText={downloadProgress === downloadedFileSize ? "Processing..." : "Downloading..."}
                     progressDuration={4000}
                     icon={<Download className="h-4 w-4" />}
                     fileSize={downloadedFileSize}

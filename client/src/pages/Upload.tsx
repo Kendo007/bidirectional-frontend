@@ -592,34 +592,28 @@ export default function UploadPage() {
               </CardContent>
 
               <CardFooter className="flex justify-between border-t px-6 py-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={showPreviewDialog}
-                  disabled={isUploading}
-                  className="bg-white border border-slate-200 hover:bg-slate-100 text-slate-900"
-                >
-                  {uploadProgress ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
+                {!isUploading &&
+                  (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={showPreviewDialog}
+                      disabled={isUploading}
+                      className="bg-white border border-slate-200 hover:bg-slate-100 text-slate-900"
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span>Preview Data</span>
+                    </Button>
                   )}
-
-                  <span>
-                    {uploadProgress
-                      ? uploadProgress.loaded >= uploadProgress.total
-                        ? "Processing..."
-                        : "Uploading..."
-                      : "Preview Data"}
-                  </span>
-                </Button>
 
                 <div className="w-full space-y-1">
                   <ProgressButton
                     type="submit"
                     isLoading={isUploading}
                     disabled={isUploading || selectedColumns.length === 0}
-                    loadingText="Uploading..."
+                    loadingText={uploadProgress ?
+                      (uploadProgress.loaded < uploadProgress.total ? "Uploading..." : "Processing...")
+                      : "Uploading..."}
                     progressDuration={3000}
                     icon={<UploadIcon className="h-4 w-4" />}
                     fileSize={form.getValues().file?.size}

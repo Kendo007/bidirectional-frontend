@@ -34,7 +34,7 @@ export default function ConnectionForm({ onSubmit, title }: ConnectionFormProps)
     resolver: zodResolver(connectionSchema),
     defaultValues: {
       protocol: 'http',
-      host: 'localhost',
+      host: '',
       port: '8123',
       username: '',
       database: '',
