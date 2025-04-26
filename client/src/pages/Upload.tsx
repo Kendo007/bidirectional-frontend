@@ -232,6 +232,7 @@ export default function UploadPage() {
 
       // Prepare upload configuration
       const uploadConfig = {
+        totalCols: Object.keys(selectedColumnTypes).length,
         connection: connectionConfig,
         tableName: formValues.tableName,
         createNewTable: formValues.createNewTable,

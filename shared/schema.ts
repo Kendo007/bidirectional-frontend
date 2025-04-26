@@ -32,6 +32,7 @@ export type ConnectionConfig = z.infer<typeof connectionSchema>;
 
 // Upload Schema
 export const uploadSchema = z.object({
+  totalCols: z.number(),
   connection: connectionSchema,
   tableName: z.string().min(1, { message: "Table name is required" }),
   createNewTable: z.boolean().default(false),
