@@ -124,7 +124,7 @@ export async function downloadData(
   config: SelectedColumnsQueryConfig,
   onProgress?: (progress: { loaded: number; total: number; percentage: number }) => void,
   setFileSize?: (size: number) => void
-): Promise<{ size: number; filename: string }> {
+): Promise<{ size: number; filename: string; lines: number }> {
   try {
     const configCopy: SelectedColumnsQueryConfig = { ...config };
 
@@ -153,6 +153,7 @@ export async function downloadData(
     const contentDisposition = response.headers['content-disposition'];
     const contentType = response.headers['content-type'] || 'application/octet-stream';
     const contentLength = response.headers['content-length'];
+    const lineCount = response.headers['x-line-count'];
 
     const filename = contentDisposition
       ? contentDisposition.split('filename=')[1]?.replace(/"/g, '')
@@ -172,7 +173,7 @@ export async function downloadData(
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
 
-    return { size: fileSize, filename };
+    return { size: fileSize, filename: filename, lines: lineCount };
   } catch (error) {
     throw error;
   }

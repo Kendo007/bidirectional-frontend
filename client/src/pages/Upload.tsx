@@ -259,11 +259,6 @@ export default function UploadPage() {
           title: "Upload Successful",
           description: result.message || "Data uploaded successfully",
         });
-        // Don't reset form immediately so the line count can be displayed
-        setTimeout(() => {
-          resetForm();
-          setUploadedLineCount(undefined);
-        }, 3000);
       } else {
         throw new Error(result.message || "Upload failed");
       }

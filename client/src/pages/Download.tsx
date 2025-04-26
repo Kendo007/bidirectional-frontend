@@ -376,7 +376,8 @@ export default function DownloadPage() {
   const [downloadedFileSize, setDownloadedFileSize] = useState<number | undefined>(undefined);
   const [downloadedFileName, setDownloadedFileName] = useState<string | undefined>(undefined);
   const [downloadProgress, setDownloadProgress] = useState<{ loaded: number; total: number; percentage: number } | undefined>(undefined);
-
+  const [downloadedLineCount, setDownloadedLineCount] = useState<number | undefined>(undefined);
+  
   const handleDownload = async () => {
     if (!connectionConfig || !mainTable) {
       toast({
@@ -401,6 +402,7 @@ export default function DownloadPage() {
       // Reset file size and progress if a new download is initiated
       setDownloadedFileSize(undefined);
       setDownloadProgress(undefined);
+      setDownloadedLineCount(undefined);
 
       // Prepare the joined tables data if using multiple tables
       let joinTablesData = undefined;
@@ -451,6 +453,7 @@ export default function DownloadPage() {
       // Set file size and name only after download completes
       setDownloadedFileSize(result.size);
       setDownloadedFileName(result.filename);
+      setDownloadedLineCount(result.lines);
 
       toast({
         title: "Download Complete",
@@ -876,6 +879,7 @@ export default function DownloadPage() {
                     fileSize={downloadedFileSize}
                     showSize={true}
                     actualProgress={downloadProgress}
+                    lineCount={downloadedLineCount}
                   >
                     Download Results
                   </ProgressButton>

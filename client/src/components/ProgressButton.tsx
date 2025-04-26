@@ -18,10 +18,10 @@ interface ProgressButtonProps {
   fileSize?: number; // size in bytes
   totalSize?: number; // total size in bytes for download progress
   showSize?: boolean; // whether to show size information
-  actualProgress?: { 
-    loaded: number; 
-    total: number; 
-    percentage: number 
+  actualProgress?: {
+    loaded: number;
+    total: number;
+    percentage: number
   }; // real progress from XHR request
   lineCount?: number; // number of lines/rows processed
 }
@@ -53,12 +53,12 @@ export default function ProgressButton({
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
     let size = sizeInBytes;
     let unitIndex = 0;
-    
+
     while (size >= 1024 && unitIndex < units.length - 1) {
       size /= 1024;
       unitIndex++;
     }
-    
+
     return `${size.toFixed(1)} ${units[unitIndex]}`;
   };
 
@@ -85,7 +85,7 @@ export default function ProgressButton({
         setProgress(0);
         setCurrentSize(0);
         setCompleted(false);
-        
+
         intervalRef.current = setInterval(() => {
           setProgress(prev => {
             // Only increase to 95% max during automatic progression
@@ -99,7 +99,7 @@ export default function ProgressButton({
             }
             return prev + 1;
           });
-          
+
           // Simulate progress for file size if totalSize is provided
           if (totalSize && fileSize) {
             setCurrentSize(prev => {
@@ -123,7 +123,7 @@ export default function ProgressButton({
         setProgress(100);
         if (fileSize) setCurrentSize(fileSize);
         setCompleted(true);
-        
+
         // Reset after animation completes
         const timeout = setTimeout(() => {
           setProgress(0);
@@ -135,37 +135,37 @@ export default function ProgressButton({
   }, [isLoading, progressDuration, fileSize, totalSize, progress, actualProgress]);
 
   // Create gradient color for progress bar
-  const progressBarColor = isLoading 
+  const progressBarColor = isLoading
     ? "bg-gradient-to-r from-blue-200 via-blue-400 to-blue-600"
     : completed ? "bg-green-500" : "bg-blue-100";
 
   return (
     <div className="flex flex-col space-y-2">
       {/* Show progress section when loading or immediately after completion */}
-      {(isLoading || (completed && progress > 0)) && (
+      {isLoading && (
         <div className="mb-2 p-3 border rounded-md bg-slate-50">
           <div className="mb-2 flex justify-between items-center text-xs text-slate-600">
             <span className="font-medium">{formatFileSize(currentSize)} / {formatFileSize(fileSize)}</span>
             <span className="font-semibold">{(progress).toFixed(0)}%</span>
           </div>
-          
+
           <div className="h-3 w-full bg-slate-200 rounded-full overflow-hidden">
-            <div 
-              className="h-3 transition-all duration-300 bg-blue-500 rounded-full" 
+            <div
+              className="h-3 transition-all duration-300 bg-blue-500 rounded-full"
               style={{ width: `${progress}%` }}
             />
           </div>
-          
-          {/* Show line count if available and completed */}
-          {completed && lineCount !== undefined && (
-            <div className="mt-2 flex items-center text-xs text-slate-600">
-              <Info className="h-3.5 w-3.5 mr-1 text-blue-500" />
-              <span className="font-medium">{lineCount.toLocaleString()} lines processed</span>
-            </div>
-          )}
         </div>
       )}
-      
+
+      {/* Show line count if available and completed */}
+      {completed && lineCount !== undefined && (
+        <div className="mt-2 flex items-center text-xs text-slate-600">
+          <Info className="h-3.5 w-3.5 mr-1 text-blue-500" />
+          <span className="font-medium">{lineCount.toLocaleString()} lines ingested</span>
+        </div>
+      )}
+
       <Button
         type={type}
         onClick={onClick}
