@@ -48,7 +48,7 @@ export default function Home() {
                 )} />
               </div>
               <h3 className="text-xl font-semibold text-center mb-2">Upload to ClickHouse</h3>
-              <p className="text-slate-600 text-center mb-4">Upload CSV or other data files to your ClickHouse database.</p>
+              <p className="text-slate-600 text-center mb-4">Upload CSV files to your ClickHouse database.</p>
             </CardContent>
           </Card>
 
@@ -70,7 +70,7 @@ export default function Home() {
                 )} />
               </div>
               <h3 className="text-xl font-semibold text-center mb-2">Download from ClickHouse</h3>
-              <p className="text-slate-600 text-center mb-4">Query and download data from your ClickHouse database.</p>
+              <p className="text-slate-600 text-center mb-4">Download data from your ClickHouse database.</p>
             </CardContent>
           </Card>
         </div>

@@ -31,7 +31,7 @@ function App() {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 2v20M2 12h20M20 16l-4-4 4-4M8 8l-4 4 4 4" />
                   </svg>
-                  <h1 className="text-xl font-semibold text-slate-900">ClickHouse Data Manager</h1>
+                  <h1 className="text-xl font-semibold text-slate-900">ClickHouse Ingestor</h1>
                 </div>
               </div>
             </div>
@@ -44,7 +44,7 @@ function App() {
           <footer className="bg-white border-t border-slate-200 py-4">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center text-sm text-slate-500">
-                ClickHouse Data Manager &copy; {new Date().getFullYear()}
+                ClickHouse Ingestor &copy; {new Date().getFullYear()}
               </div>
             </div>
           </footer>
