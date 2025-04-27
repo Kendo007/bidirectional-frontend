@@ -7,6 +7,7 @@ import { ArrowLeft, Download, Eye, Loader2, Plus, X, RefreshCw, ArrowLeftRight }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -63,8 +64,7 @@ export default function DownloadPage() {
     id: number;
     tableName: string;
     joinType: "INNER JOIN" | "LEFT JOIN" | "RIGHT JOIN" | "OUTER JOIN";
-    sourceColumn: string;
-    targetColumn: string;
+    joinCondition: string;
     columns: ColumnInfo[];
     selectedColumns: string[];
   }[]>([]);
@@ -254,8 +254,7 @@ export default function DownloadPage() {
         id: newId,
         tableName: '',
         joinType: 'INNER JOIN',
-        sourceColumn: '',
-        targetColumn: '',
+        joinCondition: '',
         columns: [],
         selectedColumns: []
       }
@@ -315,12 +314,11 @@ export default function DownloadPage() {
       if (useMultipleTables && joinTables.length > 0) {
         // Filter out any join table that doesn't have all the required fields
         joinTablesData = joinTables
-          .filter(jt => jt.tableName && jt.sourceColumn && jt.targetColumn)
+          .filter(jt => jt.tableName && jt.joinCondition)
           .map(jt => ({
             tableName: jt.tableName,
             joinType: jt.joinType,
-            sourceColumn: jt.sourceColumn,
-            targetColumn: jt.targetColumn
+            joinCondition: jt.joinCondition,
           }));
       }
 
@@ -377,7 +375,7 @@ export default function DownloadPage() {
   const [downloadedFileName, setDownloadedFileName] = useState<string | undefined>(undefined);
   const [downloadProgress, setDownloadProgress] = useState<{ loaded: number; total: number; percentage: number } | undefined>(undefined);
   const [downloadedLineCount, setDownloadedLineCount] = useState<number | undefined>(undefined);
-  
+
   const handleDownload = async () => {
     if (!connectionConfig || !mainTable) {
       toast({
@@ -409,12 +407,11 @@ export default function DownloadPage() {
       if (useMultipleTables && joinTables.length > 0) {
         // Filter out any join table that doesn't have all the required fields
         joinTablesData = joinTables
-          .filter(jt => jt.tableName && jt.sourceColumn && jt.targetColumn)
+          .filter(jt => jt.tableName && jt.joinCondition)
           .map(jt => ({
             tableName: jt.tableName,
             joinType: jt.joinType,
-            sourceColumn: jt.sourceColumn,
-            targetColumn: jt.targetColumn
+            joinCondition: jt.joinCondition,
           }));
       }
 
@@ -719,43 +716,17 @@ export default function DownloadPage() {
                                     ))}
                                   </SelectContent>
                                 </Select>
-                                <span className="text-sm">ON</span>
-                                <Select
-                                  value={joinTable.sourceColumn}
-                                  onValueChange={(value) =>
-                                    updateJoinTable(joinTable.id, 'sourceColumn', value)
-                                  }
-                                >
-                                  <SelectTrigger className="w-[140px] h-8">
-                                    <SelectValue placeholder="Source column" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {columns.map((column) => (
-                                      <SelectItem key={column.name} value={column.name}>
-                                        {column.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <span className="text-sm">=</span>
-                                <Select
-                                  value={joinTable.targetColumn}
-                                  onValueChange={(value) =>
-                                    updateJoinTable(joinTable.id, 'targetColumn', value)
-                                  }
-                                  disabled={!joinTable.tableName || joinTable.columns.length === 0}
-                                >
-                                  <SelectTrigger className="w-[140px] h-8">
-                                    <SelectValue placeholder="Target column" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {joinTable.columns.map((column) => (
-                                      <SelectItem key={column.name} value={column.name}>
-                                        {column.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
+                                <span className="text-sm flex items-center">ON</span>
+                                <Textarea
+                                  spellCheck={false}
+                                  autoCorrect="off"
+                                  autoComplete="off"
+                                  placeholder="Enter ON condition"
+                                  value={joinTable.joinCondition}
+                                  onChange={(e) => updateJoinTable(joinTable.id, 'joinCondition', e.target.value)}
+                                  className="min-h-8 h-auto max-h-64 min-w-[250px] w-[500px] px-2 py-1 resize text-sm overflow-auto font-semibold"
+                                  rows={1}
+                                />
                               </div>
 
                               {/* Join Table Columns Selection */}

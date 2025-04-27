@@ -1,6 +1,6 @@
 import { pgTable, text, serial, integer, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
+import { custom, z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -81,8 +81,7 @@ export const selectedColumnsQuerySchema = z.object({
   joinTables: z.array(z.object({
     tableName: z.string(),
     joinType: z.enum(["INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "OUTER JOIN"]),
-    sourceColumn: z.string(),
-    targetColumn: z.string()
+    joinCondition: z.string(),
   })).optional(),
 });
 
