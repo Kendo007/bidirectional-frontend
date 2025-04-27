@@ -63,7 +63,9 @@ export default function DownloadPage() {
   const [joinTables, setJoinTables] = useState<{
     id: number;
     tableName: string;
-    joinType: "INNER JOIN" | "LEFT JOIN" | "RIGHT JOIN" | "OUTER JOIN";
+    joinType:
+    "INNER JOIN" | "LEFT JOIN" | "RIGHT JOIN" | "OUTER JOIN" | "SEMI JOIN"
+    | "ANTI JOIN" | "ANY JOIN" | "GLOBAL JOIN" | "ARRAY JOIN";
     joinCondition: string;
     columns: ColumnInfo[];
     selectedColumns: string[];
@@ -697,6 +699,11 @@ export default function DownloadPage() {
                                     <SelectItem value="LEFT JOIN">Left Join</SelectItem>
                                     <SelectItem value="RIGHT JOIN">Right Join</SelectItem>
                                     <SelectItem value="OUTER JOIN">Full Outer Join</SelectItem>
+                                    <SelectItem value="SEMI JOIN">Semi Join</SelectItem>
+                                    <SelectItem value="ANTI JOIN">Anti Join</SelectItem>
+                                    <SelectItem value="ANY JOIN">Any Join</SelectItem>
+                                    <SelectItem value="GLOBAL JOIN">Global Join</SelectItem>
+                                    <SelectItem value="ARRAY JOIN">Array Join</SelectItem>
                                   </SelectContent>
                                 </Select>
                                 <Select

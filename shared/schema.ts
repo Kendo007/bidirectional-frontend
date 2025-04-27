@@ -80,7 +80,17 @@ export const selectedColumnsQuerySchema = z.object({
   delimiter: z.string().max(3, { message: "Delimiter must be <= 3 character" }).optional(),
   joinTables: z.array(z.object({
     tableName: z.string(),
-    joinType: z.enum(["INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "OUTER JOIN"]),
+    joinType: z.enum([
+      "INNER JOIN", 
+      "LEFT JOIN", 
+      "RIGHT JOIN", 
+      "OUTER JOIN", 
+      "SEMI JOIN", 
+      "ANTI JOIN", 
+      "ANY JOIN", 
+      "GLOBAL JOIN", 
+      "ARRAY JOIN"
+    ]),
     joinCondition: z.string(),
   })).optional(),
 });

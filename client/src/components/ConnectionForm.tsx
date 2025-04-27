@@ -27,9 +27,8 @@ interface ConnectionFormProps {
 export default function ConnectionForm({ onSubmit, title }: ConnectionFormProps) {
   const [isTesting, setIsTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
-  const [authType, setAuthType] = useState<"password" | "jwt">("password");
   const { toast } = useToast();
-
+  
   const form = useForm<ConnectionConfig>({
     resolver: zodResolver(connectionSchema),
     defaultValues: {
@@ -43,18 +42,8 @@ export default function ConnectionForm({ onSubmit, title }: ConnectionFormProps)
       jwt: '',
     },
   });
-
-  // Listen for auth type changes from the form
-  useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (name === 'authType' && value.authType) {
-        setAuthType(value.authType as "password" | "jwt");
-      }
-    });
-    
-    return () => subscription.unsubscribe();
-  }, [form.watch]);
-
+  
+  const authType = form.watch('authType');
   const onTestConnection = async () => {
     try {
       const values = form.getValues();
@@ -173,10 +162,7 @@ export default function ConnectionForm({ onSubmit, title }: ConnectionFormProps)
                   type="button"
                   variant={authType === "password" ? "default" : "outline"}
                   className={authType === "password" ? "bg-blue-600 hover:bg-blue-700" : ""}
-                  onClick={() => {
-                    setAuthType("password");
-                    form.setValue("authType", "password");
-                  }}
+                  onClick={() => form.setValue("authType", "password")}
                 >
                   Password
                 </Button>
@@ -184,10 +170,7 @@ export default function ConnectionForm({ onSubmit, title }: ConnectionFormProps)
                   type="button"
                   variant={authType === "jwt" ? "default" : "outline"}
                   className={authType === "jwt" ? "bg-blue-600 hover:bg-blue-700" : ""}
-                  onClick={() => {
-                    setAuthType("jwt");
-                    form.setValue("authType", "jwt");
-                  }}
+                  onClick={() => form.setValue("authType", "jwt")}
                 >
                   JWT Token
                 </Button>
@@ -196,13 +179,14 @@ export default function ConnectionForm({ onSubmit, title }: ConnectionFormProps)
             
             {authType === "password" ? (
               <FormField
+                key="password"
                 control={form.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input type="password" placeholder="Enter your Password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -210,13 +194,14 @@ export default function ConnectionForm({ onSubmit, title }: ConnectionFormProps)
               />
             ) : (
               <FormField
+                key="jwt"
                 control={form.control}
                 name="jwt"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>JWT Token</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your JWT token" {...field} />
+                      <Input type="text" placeholder="Enter your JWT token" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
