@@ -684,7 +684,6 @@ export default function DownloadPage() {
                             <CardContent className="px-4 py-3 space-y-4">
                               {/* Join Configuration as a single line */}
                               <div className="flex flex-wrap items-center gap-2 bg-slate-50 p-3 rounded-md border">
-                                <span className="text-sm font-medium">{mainTable}</span>
                                 <Select
                                   value={joinTable.joinType}
                                   onValueChange={(value) =>
